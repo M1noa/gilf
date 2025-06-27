@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Self Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #36393f;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .login-form {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .login-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #40444b;
+            color: #ffffff;
+        }
+
+        .login-form button {
+            background-color: #7289da;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .user-info {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .user-info .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .user-info .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .stat-card {
+            background-color: #40444b;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .notifications {
+            margin-top: 20px;
+            background-color: #40444b;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-form" id="loginForm">
+            <h2>Discord Self Bot Login</h2>
+            <input type="text" id="token" placeholder="Enter your Discord token" />
+            <button onclick="connect()">Connect</button>
+        </div>
+
+        <div class="user-info" id="userInfo">
+            <div class="header">
+                <img class="avatar" id="userAvatar" src="" alt="User avatar">
+                <div>
+                    <h2 id="username"></h2>
+                    <p id="userId"></p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Servers</h3>
+                    <p id="serverCount">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Friends</h3>
+                    <p id="friendCount">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Badges</h3>
+                    <p id="badges"></p>
+                </div>
+            </div>
+
+            <div class="notifications">
+                <h3>Notifications</h3>
+                <div id="notificationList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+
+        function connect() {
+            const token = document.getElementById('token').value;
+            if (!token) return;
+
+            ws = new WebSocket(`ws://${window.location.host}/ws?token=${token}`);
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'ready') {
+                    displayUserInfo(data.data);
+                }
+            };
+
+            ws.onclose = function() {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('userInfo').style.display = 'none';
+            };
+        }
+
+        function displayUserInfo(data) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+
+            document.getElementById('username').textContent = data.username;
+            document.getElementById('userId').textContent = `ID: ${data.id}`;
+            document.getElementById('serverCount').textContent = data.server_count;
+            document.getElementById('friendCount').textContent = data.friend_count;
+            
+            if (data.avatar_url) {
+                document.getElementById('userAvatar').src = data.avatar_url;
+            }
+
+            // Convert flags to badges
+            const badges = [];
+            if (data.flags & 1) badges.push('Staff');
+            if (data.flags & 2) badges.push('Partner');
+            if (data.flags & 4) badges.push('HypeSquad Events');
+            document.getElementById('badges').textContent = badges.join(', ') || 'None';
+        }
+    </script>
+</body>
+</html>
