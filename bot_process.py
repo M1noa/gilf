@@ -3,6 +3,7 @@ import os
 import signal
 import sys
 from typing import Optional
+import discord
 from discord_client import DiscordSelfBot
 from command_handler import get_command_handler
 from token_manager import TokenManager
@@ -37,36 +38,45 @@ class BotProcess:
                 self.logger.warning("Forcing process exit")
                 os._exit(0)
     
-    async def start_bot(self, token: str, session_id: str = None) -> bool:
+    async def start_bot(self, token: str, session_id: str = None) -> tuple[bool, str]:
         """Start the Discord bot"""
         try:
             self.logger.info("Starting Discord bot process...")
-            
+
             # Load command statistics
             await self.command_handler.load_command_stats()
-            
+
             # Create bot instance
             self.bot = DiscordSelfBot(session_id=session_id)
-            
+
             # Add command handler to bot
             @self.bot.event
             async def on_message(message):
                 # Don't respond to own messages
                 if message.author == self.bot.user:
                     return
-                
+
                 # Process commands
                 await self.command_handler.process_message(message, self.bot)
-            
+
             # Start the bot
             self.running = True
-            await self.bot.start(token)
-            
-            return True
-            
+            # The start method is blocking, so we need to run it in a task
+            # to allow the rest of the application to continue.
+            # We'll await the on_ready event to confirm successful login.
+            asyncio.create_task(self.bot.start(token))
+            await self.bot.wait_until_ready()
+
+            return True, "Bot started successfully"
+
+        except discord.errors.LoginFailure:
+            self.logger.error("Failed to start bot: Invalid token")
+            self.running = False
+            return False, "Invalid token"
         except Exception as e:
             self.logger.error(f"Failed to start bot: {e}", exc_info=True)
-            return False
+            self.running = False
+            return False, f"An unexpected error occurred: {e}"
     
     async def stop_bot(self):
         """Stop the Discord bot"""
@@ -78,7 +88,7 @@ class BotProcess:
             await self.command_handler.save_command_stats()
             
             if self.bot:
-                await self.bot.close_bot()
+                await self.bot.close()
                 self.bot = None
             
             self.logger.info("Bot stopped successfully")
@@ -158,14 +168,14 @@ class BotProcess:
                     return
                 
                 # Start bot
-                success = await self.start_bot(token, session_id)
+                success, message = await self.start_bot(token, session_id)
                 if success:
-                    await self.session_manager.send_to_session(
-                        session_id, {"type": "bot_started", "message": "Bot started successfully"}
-                    )
+                    # The 'discord_ready' event will be sent by the discord_client, 
+                    # so we don't need to send a 'bot_started' message here.
+                    pass
                 else:
                     await self.session_manager.send_to_session(
-                        session_id, {"type": "error", "message": "Failed to start bot"}
+                        session_id, {"type": "error", "message": message}
                     )
             
             elif message_type == "stop_bot":

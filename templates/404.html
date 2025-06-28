@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rubik+80s+Fade&display=swap');
+
+        :root {
+            --background: #000000;
+            --text: rgba(255, 192, 203, 0.95);
+            --text-muted: rgba(255, 192, 203, 0.7);
+            --text-bright: rgb(255, 220, 225);
+            --card-bg: rgba(255, 192, 203, 0.15);
+            --card-hover: rgba(255, 192, 203, 0.22);
+            --border: rgba(255, 192, 203, 0.4);
+            --hover-border: rgba(255, 192, 203, 0.6);
+            --button-bg: rgba(255, 192, 203, 0.25);
+            --button-hover: rgba(255, 192, 203, 0.35);
+            --button-primary-bg: #ff8fab;
+            --button-primary-hover: #ff6b97;
+            --button-primary-text: #000000;
+            --link-color: #ffadc4;
+            --link-hover: #ffc7d9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-container {
+            max-width: 600px;
+            padding: 3rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .error-code {
+            font-family: 'Rubik 80s Fade', cursive;
+            font-size: 8rem;
+            color: var(--text-bright);
+            margin-bottom: 1rem;
+            animation: glitch 3s infinite;
+        }
+
+        .error-message {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .home-link {
+            display: inline-block;
+            padding: 0.8em 2em;
+            background: var(--button-primary-bg);
+            color: var(--button-primary-text);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .home-link:hover {
+            background: var(--button-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: none; opacity: 1; }
+            92% { transform: skew(1deg, 1deg); opacity: 0.95; }
+            94% { transform: skew(-1deg, -1deg); opacity: 0.9; }
+            96% { transform: skew(2deg, -1deg); opacity: 0.85; }
+            98% { transform: skew(-2deg, 1deg); opacity: 0.9; }
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6rem;
+            }
+
+            .error-message {
+                font-size: 1.2rem;
+            }
+
+            .error-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <div class="error-message">Oops! The page you're looking for doesn't exist.</div>
+        <a href="/" class="home-link">Return Home</a>
+    </div>
+</body>
+</html>

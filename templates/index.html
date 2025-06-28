@@ -3,170 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Self Bot</title>
+    <title>gilf - Dashboard</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #36393f;
-            color: #ffffff;
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rubik+80s+Fade&display=swap');
+
+        :root {
+            --background: #000000;
+            --text: rgba(255, 192, 203, 0.95);
+            --text-muted: rgba(255, 192, 203, 0.7);
+            --text-bright: rgb(255, 220, 225);
+            --card-bg: rgba(255, 192, 203, 0.15);
+            --card-hover: rgba(255, 192, 203, 0.22);
+            --border: rgba(255, 192, 203, 0.4);
+            --hover-border: rgba(255, 192, 203, 0.6);
+            --button-bg: rgba(255, 192, 203, 0.25);
+            --button-hover: rgba(255, 192, 203, 0.35);
+            --button-primary-bg: #ff8fab;
+            --button-primary-hover: #ff6b97;
+            --button-primary-text: #000000;
+            --link-color: #ffadc4;
+            --link-hover: #ffc7d9;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 1em 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5em;
+        }
+
+        .header-title-section {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5em;
+        }
+
+        .site-title {
+            font-family: 'Rubik 80s Fade', cursive;
+            font-size: 1.8rem;
+            color: var(--text);
+            margin: 0;
+            cursor: pointer;
+            animation: glint 8s linear infinite;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 1.5em;
+        }
+
+        .nav-link {
+            color: var(--text);
+            text-decoration: none;
+            padding: 0.5em 1em;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(0.8);
+        }
+
+        .nav-link.active {
+            color: var(--text-bright);
+        }
+
+        .nav-link.active::after {
+            transform: scaleX(1);
+            background-color: var(--text-bright);
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 1200px;
+            margin: 2em auto;
+            padding: 0 1.5em;
         }
 
-        .login-form {
-            background-color: #2f3136;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2em;
+            border: 1px solid var(--border);
         }
 
-        .login-form input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #40444b;
-            color: #ffffff;
-        }
-
-        .login-form button {
-            background-color: #7289da;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .user-info {
-            background-color: #2f3136;
-            padding: 20px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .user-info .header {
+        .user-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 2em;
+            padding-bottom: 1em;
+            border-bottom: 1px solid var(--border);
         }
 
-        .user-info .avatar {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            margin-right: 15px;
+        .user-info-main h2 {
+            color: var(--text-bright);
+            margin-bottom: 0.5em;
         }
 
-        .user-info .stats {
+        .user-id {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .logout-btn {
+            background: var(--button-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.5em 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: var(--button-hover);
+            border-color: var(--hover-border);
+        }
+
+        .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
+            gap: 1.5em;
         }
 
         .stat-card {
-            background-color: #40444b;
-            padding: 15px;
-            border-radius: 4px;
+            background: var(--card-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5em;
+            text-align: center;
+            transition: all 0.2s ease;
         }
 
-        .notifications {
-            margin-top: 20px;
-            background-color: #40444b;
-            padding: 15px;
-            border-radius: 4px;
-            max-height: 200px;
-            overflow-y: auto;
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--hover-border);
+        }
+
+        .stat-card h3 {
+            color: var(--text-muted);
+            margin-bottom: 0.5em;
+            font-size: 1em;
+        }
+
+        .stat-value {
+            color: var(--text-bright);
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .connecting-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1em;
+            color: var(--text-bright);
+        }
+
+        .connecting-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--text-muted);
+            border-top: 3px solid var(--text-bright);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1em 1.5em;
+            border-radius: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes glint {
+            0%, 100% { text-shadow: none; }
+            80% { text-shadow: none; }
+            85% { text-shadow: 0 0 10px var(--text-bright), 0 0 20px var(--text-bright); }
+            90% { text-shadow: none; }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1em;
+                text-align: center;
+            }
+
+            .header-nav {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title-section">
+                <h1 class="site-title" onclick="window.location.href='/';">gilf</h1>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="nav-link active">Home</a>
+                <a href="/test" class="nav-link">Test Framework</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="connecting-overlay" id="connectingOverlay">
+        <div class="spinner"></div>
+        <p id="connectionStatus">Connecting to Discord...</p>
+    </div>
+
     <div class="container">
-        <div class="login-form" id="loginForm">
-            <h2>Discord Self Bot Login</h2>
-            <input type="text" id="token" placeholder="Enter your Discord token" />
-            <button onclick="connect()">Connect</button>
-        </div>
-
-        <div class="user-info" id="userInfo">
-            <div class="header">
-                <img class="avatar" id="userAvatar" src="" alt="User avatar">
-                <div>
-                    <h2 id="username"></h2>
-                    <p id="userId"></p>
-                </div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Servers</h3>
-                    <p id="serverCount">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Friends</h3>
-                    <p id="friendCount">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Badges</h3>
-                    <p id="badges"></p>
-                </div>
-            </div>
-
-            <div class="notifications">
-                <h3>Notifications</h3>
-                <div id="notificationList"></div>
-            </div>
-        </div>
+        <main class="main-content" id="userInfo">
+            <!-- User info will be dynamically populated here -->
+        </main>
     </div>
 
     <script>
         let ws;
+        let botStatus = null;
 
-        function connect() {
-            const token = document.getElementById('token').value;
-            if (!token) return;
+        async function checkBotStatus() {
+            try {
+                const response = await fetch('/api/bot/status');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error checking bot status:', error);
+                return null;
+            }
+        }
 
-            ws = new WebSocket(`ws://${window.location.host}/ws?token=${token}`);
-
-            ws.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                if (data.type === 'ready') {
-                    displayUserInfo(data.data);
+        async function startBot() {
+            try {
+                const response = await fetch('/api/bot/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showNotification(data.message, 'success');
+                    return true;
+                } else {
+                    const error = await response.json();
+                    showNotification(error.detail || 'Failed to start bot', 'error');
+                    if (error.detail && error.detail.includes('No token configured')) {
+                        setTimeout(() => {
+                            window.location.href = '/login';
+                        }, 2000);
+                    }
+                    return false;
                 }
-            };
+            } catch (error) {
+                console.error('Error starting bot:', error);
+                showNotification('Failed to start bot', 'error');
+                return false;
+            }
+        }
 
-            ws.onclose = function() {
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('userInfo').style.display = 'none';
-            };
+        async function connect() {
+            document.getElementById('connectingOverlay').classList.add('show');
+            document.getElementById('connectionStatus').textContent = 'Checking bot status...';
+
+            // Check if bot is already running
+            botStatus = await checkBotStatus();
+            
+            if (!botStatus || !botStatus.running) {
+                document.getElementById('connectionStatus').textContent = 'Starting bot...';
+                const started = await startBot();
+                if (!started) {
+                    document.getElementById('connectingOverlay').classList.remove('show');
+                    return;
+                }
+                
+                // Wait a moment for bot to initialize
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                botStatus = await checkBotStatus();
+            }
+
+            if (botStatus && botStatus.running && botStatus.connected) {
+                displayUserInfo(botStatus.user_data);
+                document.getElementById('connectingOverlay').classList.remove('show');
+                showNotification('Bot is running and connected', 'success');
+                
+                // Set up periodic status checks
+                setInterval(async () => {
+                    const currentStatus = await checkBotStatus();
+                    if (!currentStatus || !currentStatus.running) {
+                        showNotification('Bot disconnected', 'warning');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                }, 30000); // Check every 30 seconds
+            } else {
+                document.getElementById('connectingOverlay').classList.remove('show');
+                showNotification('Bot failed to connect to Discord', 'error');
+                setTimeout(() => {
+                    window.location.replace('/login');
+                }, 2000);
+            }
         }
 
         function displayUserInfo(data) {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'block';
-
-            document.getElementById('username').textContent = data.username;
-            document.getElementById('userId').textContent = `ID: ${data.id}`;
-            document.getElementById('serverCount').textContent = data.server_count;
-            document.getElementById('friendCount').textContent = data.friend_count;
-            
-            if (data.avatar_url) {
-                document.getElementById('userAvatar').src = data.avatar_url;
-            }
-
-            // Convert flags to badges
-            const badges = [];
-            if (data.flags & 1) badges.push('Staff');
-            if (data.flags & 2) badges.push('Partner');
-            if (data.flags & 4) badges.push('HypeSquad Events');
-            document.getElementById('badges').textContent = badges.join(', ') || 'None';
+            document.getElementById('connectingOverlay').classList.remove('show');
+            const userInfoContainer = document.getElementById('userInfo');
+            userInfoContainer.innerHTML = `
+                <div class="user-header">
+                    <div class="user-info-main">
+                        <h2>Welcome, ${data.username}</h2>
+                        <p class="user-id">ID: ${data.id}</p>
+                    </div>
+                    <button onclick="logout()" class="logout-btn">Logout</button>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Servers</h3>
+                        <div class="stat-value">${data.server_count}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Friends</h3>
+                        <div class="stat-value">${data.friend_count}</div>
+                    </div>
+                </div>
+            `;
         }
+
+        async function logout() {
+            try {
+                // Stop the bot
+                await fetch('/api/bot/stop', {
+                    method: 'POST'
+                });
+                
+                // Clear the token from config
+                await fetch('/api/config/token', {
+                    method: 'DELETE'
+                });
+                
+                showNotification('Logged out successfully', 'success');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+            } catch (error) {
+                console.error('Error during logout:', error);
+                // Still redirect even if there's an error
+                window.location.href = '/login';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if token is configured before attempting to connect
+            try {
+                const configResponse = await fetch('/api/config');
+                if (configResponse.ok) {
+                    const config = await configResponse.json();
+                    if (!config.discord || !config.discord.token || config.discord.token.trim() === '') {
+                        // No token configured, redirect to login immediately
+                        window.location.replace('/login');
+                        return;
+                    }
+                    // Token exists, proceed with connection
+                    connect();
+                } else {
+                    // Configuration error, redirect to login
+                    window.location.replace('/login');
+                }
+            } catch (error) {
+                // Error fetching config, redirect to login
+                window.location.replace('/login');
+            }
+        });
     </script>
 </body>
 </html>

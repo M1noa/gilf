@@ -103,32 +103,11 @@ class DiscordSelfBot(discord.Client):
         self.user_data_cache = {}
         self.cache_expiry = timedelta(minutes=5)
         self.last_cache_update = None
-    
-    async def start_bot(self, token: str):
-        """Start the bot with enhanced error handling"""
-        try:
-            self.logger.info(f"Starting Discord bot for session {self.session_id}")
-            
-            # Start event processor
-            self.event_processor_task = asyncio.create_task(
-                self.message_queue.process_events(self._handle_queued_event)
-            )
-            
-            await self.start(token)
-            
-        except discord.LoginFailure as e:
-            self.logger.error(f"Login failed: {e}")
-            await self._send_error_to_session("login_failed", str(e))
-            raise
-        except discord.HTTPException as e:
-            self.logger.error(f"HTTP error during startup: {e}")
-            await self._send_error_to_session("http_error", str(e))
-            raise
-        except Exception as e:
-            self.logger.error(f"Unexpected error during startup: {e}", exc_info=True)
-            await self._send_error_to_session("startup_error", str(e))
-            raise
 
+    async def wait_until_ready(self):
+        """Wait until the bot is ready."""
+        await self.wait_for('ready')
+    
     async def on_ready(self):
         """Enhanced on_ready with comprehensive user data"""
         try:

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - gilf</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rubik+80s+Fade&display=swap');
+
+        :root {
+            --background: #000000;
+            --text: rgba(255, 192, 203, 0.95);
+            --text-muted: rgba(255, 192, 203, 0.7);
+            --text-bright: rgb(255, 220, 225);
+            --card-bg: rgba(255, 192, 203, 0.15);
+            --card-hover: rgba(255, 192, 203, 0.22);
+            --border: rgba(255, 192, 203, 0.4);
+            --hover-border: rgba(255, 192, 203, 0.6);
+            --button-bg: rgba(255, 192, 203, 0.25);
+            --button-hover: rgba(255, 192, 203, 0.35);
+            --button-primary-bg: #ff8fab;
+            --button-primary-hover: #ff6b97;
+            --button-primary-text: #000000;
+            --link-color: #ffadc4;
+            --link-hover: #ffc7d9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 1em 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5em;
+        }
+
+        .site-title {
+            font-family: 'Rubik 80s Fade', cursive;
+            font-size: 1.8rem;
+            color: var(--text);
+            margin: 0;
+            cursor: pointer;
+            animation: glint 8s linear infinite;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 4em auto;
+            padding: 2em;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .login-form {
+            text-align: center;
+        }
+
+        .login-form h2 {
+            margin-bottom: 1.5em;
+            color: var(--text-bright);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 0.8em 1em;
+            background: var(--card-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-bright);
+            margin-bottom: 1em;
+            font-family: inherit;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--button-primary-bg);
+        }
+
+        .login-form button {
+            background: var(--button-primary-bg);
+            color: var(--button-primary-text);
+            border: none;
+            padding: 0.8em 2em;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .login-form button:hover {
+            background: var(--button-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .login-form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            margin: 1em 0;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--button-primary-bg);
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            color: var(--text);
+            font-size: 0.9em;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container label:hover {
+            color: var(--text-bright);
+        }
+
+        .connecting-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1em;
+            color: var(--text-bright);
+        }
+
+        .connecting-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--text-muted);
+            border-top: 3px solid var(--text-bright);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1em 1.5em;
+            border-radius: 8px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes glint {
+            0%, 100% { text-shadow: none; }
+            80% { text-shadow: none; }
+            85% { text-shadow: 0 0 10px var(--text-bright), 0 0 20px var(--text-bright); }
+            90% { text-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1 class="site-title">gilf</h1>
+        </div>
+    </header>
+
+    <div class="connecting-overlay" id="connectingOverlay">
+        <div class="spinner"></div>
+        <p id="connectionStatus">Connecting to Discord...</p>
+    </div>
+
+    <div class="login-container">
+        <div class="login-form" id="loginForm">
+            <h2>Discord Login</h2>
+            <input type="text" id="token" placeholder="Enter your Discord token" />
+            <div class="checkbox-container">
+                <input type="checkbox" id="autoStart" checked>
+                <label for="autoStart">Auto-start bot on server startup</label>
+            </div>
+            <button onclick="connect()">Connect</button>
+        </div>
+    </div>
+
+    <script>
+        async function connect() {
+            const token = document.getElementById('token').value;
+            const autoStart = document.getElementById('autoStart') ? document.getElementById('autoStart').checked : false;
+            
+            if (!token) {
+                showNotification('Please enter a valid Discord token', 'error');
+                return;
+            }
+
+            const button = document.querySelector('.login-form button');
+            button.textContent = 'Connecting...';
+            button.disabled = true;
+
+            document.getElementById('connectingOverlay').classList.add('show');
+            document.getElementById('connectionStatus').textContent = 'Saving token...';
+
+            try {
+                // Save token and auto-start preference
+                const tokenResponse = await fetch('/api/config/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token: token,
+                        auto_start: autoStart
+                    })
+                });
+
+                if (!tokenResponse.ok) {
+                    const error = await tokenResponse.json();
+                    throw new Error(error.detail || 'Failed to save token');
+                }
+
+                document.getElementById('connectionStatus').textContent = 'Starting bot...';
+                
+                // Start the bot
+                const startResponse = await fetch('/api/bot/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token: token })
+                });
+
+                if (!startResponse.ok) {
+                    const error = await startResponse.json();
+                    throw new Error(error.detail || 'Failed to start bot');
+                }
+
+                document.getElementById('connectionStatus').textContent = 'Checking connection...';
+                
+                // Wait a moment for bot to initialize
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Check bot status
+                const statusResponse = await fetch('/api/bot/status');
+                const status = await statusResponse.json();
+                
+                if (status.running && status.connected) {
+                    showNotification('Successfully connected! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    throw new Error('Bot failed to connect to Discord');
+                }
+                
+            } catch (error) {
+                console.error('Connection error:', error);
+                showNotification(error.message || 'Connection failed', 'error');
+                resetLoginForm();
+            }
+        }
+
+        function resetLoginForm() {
+            const button = document.querySelector('.login-form button');
+            button.textContent = 'Connect';
+            button.disabled = false;
+            document.getElementById('connectingOverlay').classList.remove('show');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup enter key listener for token input
+            const tokenInput = document.getElementById('token');
+            tokenInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    connect();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

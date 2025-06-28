@@ -117,14 +117,12 @@ class SessionManager:
             self._start_cleanup_task()
             
         session_id = str(uuid.uuid4())
-        expires_at = datetime.now() + timedelta(seconds=expires_in)
         
         session = Session(
             session_id=session_id,
             user_id=user_id,
             created_at=datetime.now(),
-            expires_at=expires_at,
-            websockets=set(),
+            last_activity=datetime.now(),
             data={}
         )
         

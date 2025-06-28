@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard - Discord Self Bot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #36393f;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7289da, #5865f2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background-color: #2f3136;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            background-color: #40444b;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        .nav-tab:hover {
+            background-color: #484c52;
+        }
+
+        .nav-tab.active {
+            background-color: #7289da;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .test-controls {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: #7289da;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5865f2;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: #43b581;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #f04747;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #faa61a;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .test-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #7289da;
+        }
+
+        .summary-card.passed {
+            border-left-color: #43b581;
+        }
+
+        .summary-card.failed {
+            border-left-color: #f04747;
+        }
+
+        .summary-card.running {
+            border-left-color: #faa61a;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .summary-card p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .test-results {
+            background-color: #2f3136;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .test-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #40444b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .test-item:hover {
+            background-color: #40444b;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-name {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .test-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-passed {
+            background-color: #43b581;
+            color: white;
+        }
+
+        .status-failed {
+            background-color: #f04747;
+            color: white;
+        }
+
+        .status-running {
+            background-color: #faa61a;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .status-pending {
+            background-color: #72767d;
+            color: white;
+        }
+
+        .test-duration {
+            margin-left: 15px;
+            opacity: 0.7;
+            font-size: 12px;
+        }
+
+        .test-details {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #40444b;
+            border-radius: 4px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .test-item.expanded .test-details {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #40444b;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #43b581, #7289da);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .log-viewer {
+            background-color: #1e2124;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #40444b;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-timestamp {
+            color: #72767d;
+            margin-right: 10px;
+        }
+
+        .log-level {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .log-level.INFO {
+            color: #43b581;
+        }
+
+        .log-level.ERROR {
+            color: #f04747;
+        }
+
+        .log-level.WARNING {
+            color: #faa61a;
+        }
+
+        .log-level.DEBUG {
+            color: #7289da;
+        }
+
+        .coverage-chart {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .coverage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .coverage-bar {
+            flex: 1;
+            height: 20px;
+            background-color: #40444b;
+            border-radius: 10px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .coverage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f04747, #faa61a, #43b581);
+            transition: width 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .spinner {
+            border: 3px solid #40444b;
+            border-top: 3px solid #7289da;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .recommendations {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .recommendation-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #40444b;
+            border-radius: 4px;
+            border-left: 4px solid #faa61a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Dashboard</h1>
+            <p>Comprehensive testing suite for gilf</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">Overview</button>
+            <button class="nav-tab" onclick="switchTab('tests')">Test Results</button>
+            <button class="nav-tab" onclick="switchTab('coverage')">Coverage</button>
+            <button class="nav-tab" onclick="switchTab('logs')">Logs</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="test-controls">
+                <div class="control-group">
+                    <button class="btn btn-primary" onclick="runAllTests()" id="runAllBtn">
+                        <span id="runBtnText">Run All Tests</span>
+                    </button>
+                    <button class="btn btn-success" onclick="runPriorityTests(1)">Priority 1 Tests</button>
+                    <button class="btn btn-warning" onclick="runIntegrationTests()">Integration Tests</button>
+                    <button class="btn btn-danger" onclick="stopTests()" id="stopBtn" disabled>Stop Tests</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="test-summary" id="testSummary">
+                <div class="summary-card">
+                    <h3 id="totalTests">0</h3>
+                    <p>Total Tests</p>
+                </div>
+                <div class="summary-card passed">
+                    <h3 id="passedTests">0</h3>
+                    <p>Passed</p>
+                </div>
+                <div class="summary-card failed">
+                    <h3 id="failedTests">0</h3>
+                    <p>Failed</p>
+                </div>
+                <div class="summary-card running">
+                    <h3 id="successRate">0%</h3>
+                    <p>Success Rate</p>
+                </div>
+            </div>
+
+            <div class="recommendations" id="recommendations" style="display: none;">
+                <h3>📋 Recommendations</h3>
+                <div id="recommendationsList"></div>
+            </div>
+        </div>
+
+        <!-- Test Results Tab -->
+        <div id="tests" class="tab-content">
+            <div class="test-results" id="testResults">
+                <div class="test-item">
+                    <div class="test-name">No tests run yet</div>
+                    <div class="test-status status-pending">Pending</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coverage Tab -->
+        <div id="coverage" class="tab-content">
+            <div class="coverage-chart">
+                <h3>📊 Test Coverage</h3>
+                <div id="coverageData">
+                    <p>Run tests to see coverage data</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Tab -->
+        <div id="logs" class="tab-content">
+            <div class="log-viewer" id="logViewer">
+                <div class="log-entry">
+                    <span class="log-timestamp">[00:00:00]</span>
+                    <span class="log-level INFO">INFO</span>
+                    <span>Test dashboard initialized</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTests = [];
+        let testRunning = false;
+        let ws = null;
+
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws/test`);
+            
+            ws.onopen = function() {
+                addLog('INFO', 'Connected to test server');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleTestUpdate(data);
+            };
+            
+            ws.onclose = function() {
+                addLog('WARNING', 'Disconnected from test server');
+                setTimeout(initWebSocket, 5000); // Reconnect after 5 seconds
+            };
+            
+            ws.onerror = function(error) {
+                addLog('ERROR', 'WebSocket error: ' + error);
+            };
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Test execution functions
+        async function runAllTests() {
+            if (testRunning) return;
+            
+            testRunning = true;
+            updateRunButton(true);
+            addLog('INFO', 'Starting comprehensive test suite...');
+            
+            try {
+                const response = await fetch('/api/test/run-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                handleTestResults(result);
+                
+            } catch (error) {
+                addLog('ERROR', 'Failed to run tests: ' + error.message);
+            } finally {
+                testRunning = false;
+                updateRunButton(false);
+            }
+        }
+
+        async function runPriorityTests(priority) {
+            if (testRunning) return;
+            
+            testRunning = true;
+            addLog('INFO', `Starting Priority ${priority} tests...`);
+            
+            try {
+                const response = await fetch(`/api/test/run-priority/${priority}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                handleTestResults(result);
+                
+            } catch (error) {
+                addLog('ERROR', 'Failed to run priority tests: ' + error.message);
+            } finally {
+                testRunning = false;
+                updateRunButton(false);
+            }
+        }
+
+        async function runIntegrationTests() {
+            if (testRunning) return;
+            
+            testRunning = true;
+            addLog('INFO', 'Starting integration tests...');
+            
+            try {
+                const response = await fetch('/api/test/run-integration', {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                handleTestResults(result);
+                
+            } catch (error) {
+                addLog('ERROR', 'Failed to run integration tests: ' + error.message);
+            } finally {
+                testRunning = false;
+                updateRunButton(false);
+            }
+        }
+
+        function stopTests() {
+            if (ws) {
+                ws.send(JSON.stringify({type: 'stop_tests'}));
+            }
+            testRunning = false;
+            updateRunButton(false);
+            addLog('WARNING', 'Test execution stopped by user');
+        }
+
+        // UI update functions
+        function updateRunButton(running) {
+            const btn = document.getElementById('runAllBtn');
+            const text = document.getElementById('runBtnText');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            if (running) {
+                btn.disabled = true;
+                text.innerHTML = '<div class="spinner"></div>Running Tests...';
+                stopBtn.disabled = false;
+            } else {
+                btn.disabled = false;
+                text.textContent = 'Run All Tests';
+                stopBtn.disabled = true;
+            }
+        }
+
+        function handleTestUpdate(data) {
+            switch (data.type) {
+                case 'test_started':
+                    addLog('INFO', `Started: ${data.test_name}`);
+                    updateTestItem(data.test_name, 'running');
+                    break;
+                    
+                case 'test_completed':
+                    addLog(data.status === 'passed' ? 'INFO' : 'ERROR', 
+                          `${data.status.toUpperCase()}: ${data.test_name} (${data.duration}s)`);
+                    updateTestItem(data.test_name, data.status, data.duration, data.error);
+                    break;
+                    
+                case 'progress_update':
+                    updateProgress(data.progress);
+                    break;
+                    
+                case 'test_suite_completed':
+                    handleTestResults(data.results);
+                    break;
+            }
+        }
+
+        function handleTestResults(results) {
+            currentTests = results.test_results;
+            updateSummary(results.summary);
+            updateTestList(results.test_results);
+            updateCoverage(results.coverage);
+            updateRecommendations(results.recommendations);
+            updateProgress(100);
+            
+            addLog('INFO', `Test suite completed: ${results.summary.passed}/${results.summary.total_tests} passed`);
+        }
+
+        function updateSummary(summary) {
+            document.getElementById('totalTests').textContent = summary.total_tests;
+            document.getElementById('passedTests').textContent = summary.passed;
+            document.getElementById('failedTests').textContent = summary.failed;
+            document.getElementById('successRate').textContent = summary.success_rate + '%';
+        }
+
+        function updateTestList(tests) {
+            const container = document.getElementById('testResults');
+            container.innerHTML = '';
+            
+            tests.forEach(test => {
+                const item = createTestItem(test);
+                container.appendChild(item);
+            });
+        }
+
+        function createTestItem(test) {
+            const item = document.createElement('div');
+            item.className = 'test-item';
+            item.onclick = () => item.classList.toggle('expanded');
+            
+            const statusClass = `status-${test.status}`;
+            const duration = test.duration ? `${test.duration}s` : '';
+            
+            item.innerHTML = `
+                <div class="test-name">${test.name}</div>
+                <div>
+                    <span class="test-status ${statusClass}">${test.status}</span>
+                    <span class="test-duration">${duration}</span>
+                </div>
+                <div class="test-details">
+                    ${test.error ? `<strong>Error:</strong> ${test.error}<br>` : ''}
+                    ${test.details ? `<strong>Details:</strong> ${JSON.stringify(test.details, null, 2)}` : ''}
+                </div>
+            `;
+            
+            return item;
+        }
+
+        function updateTestItem(testName, status, duration = null, error = null) {
+            const items = document.querySelectorAll('.test-item');
+            items.forEach(item => {
+                const nameElement = item.querySelector('.test-name');
+                if (nameElement && nameElement.textContent === testName) {
+                    const statusElement = item.querySelector('.test-status');
+                    statusElement.className = `test-status status-${status}`;
+                    statusElement.textContent = status;
+                    
+                    if (duration) {
+                        const durationElement = item.querySelector('.test-duration');
+                        durationElement.textContent = `${duration}s`;
+                    }
+                    
+                    if (error) {
+                        const detailsElement = item.querySelector('.test-details');
+                        detailsElement.innerHTML = `<strong>Error:</strong> ${error}`;
+                    }
+                }
+            });
+        }
+
+        function updateProgress(percentage) {
+            const fill = document.getElementById('progressFill');
+            fill.style.width = percentage + '%';
+        }
+
+        function updateCoverage(coverage) {
+            const container = document.getElementById('coverageData');
+            
+            if (!coverage || Object.keys(coverage).length === 0) {
+                container.innerHTML = '<p>No coverage data available</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            Object.entries(coverage).forEach(([component, percentage]) => {
+                const item = document.createElement('div');
+                item.className = 'coverage-item';
+                item.innerHTML = `
+                    <span>${component}</span>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <span>${percentage}%</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateRecommendations(recommendations) {
+            const container = document.getElementById('recommendations');
+            const list = document.getElementById('recommendationsList');
+            
+            if (!recommendations || recommendations.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            
+            container.style.display = 'block';
+            list.innerHTML = '';
+            
+            recommendations.forEach(rec => {
+                const item = document.createElement('div');
+                item.className = 'recommendation-item';
+                item.textContent = rec;
+                list.appendChild(item);
+            });
+        }
+
+        function addLog(level, message) {
+            const logViewer = document.getElementById('logViewer');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-level ${level}">${level}</span>
+                <span>${message}</span>
+            `;
+            
+            logViewer.appendChild(entry);
+            logViewer.scrollTop = logViewer.scrollHeight;
+            
+            // Keep only last 100 log entries
+            while (logViewer.children.length > 100) {
+                logViewer.removeChild(logViewer.firstChild);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initWebSocket();
+            addLog('INFO', 'Test dashboard loaded');
+        });
+    </script>
+</body>
+</html>
